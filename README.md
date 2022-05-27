@@ -26,7 +26,7 @@ Questions:
 - Is everyone really committed to this project, or is it "just for college applications"? (This project will fail if it's built on building self-worth).
 - 
 
-4 Major Steps:
+3 Major Steps:
 
 - Explore: Create an algorithm for ranking/enumerating scenic locations (museums, forests, state parks etc)
 - Navigate: Create a model that maps the Bay Area urban landscape (residential district, urban areas, parks, lakes, etc)
@@ -38,5 +38,7 @@ Questions:
         
     - Put everything together to create a “scenic route”  that gets you to your destination by a certain time but still gives you a nice route.
     - Also apply the ranking system to create a city explorer with no final destination
+
+## If we have time
 - Implement the above algorithms into an app (iOS, android etc)
     -
