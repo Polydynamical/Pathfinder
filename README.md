@@ -51,7 +51,7 @@ There are a couple of apps in the App Store which have some similarity to the go
 - **Scenic Motorcycle Navigation**: Using the above formula, we can reasonably infer the app has received approximnately 900K downloads in the past 4 years. This app is closer the goals of creating an app that has visual appeal to the driver. Based on geographic maps, this app is able to decide the "windiness" of a route and provides a navigation system for motorcyclists. This provides a route that is somewhat scenic as winding roads tend to be accompanied with forests and nature. However, this app falls short in that it only factors the windiness of the app rather than specific visual features of the road. For example, Pathfinder aims to appeal to those wanting to see the local community by driving through residential districts. In addition, this app creates routes based on users' experiences and their opinion of a scenic route. According to their app description, "Scenic has a vast database of thousands of beautiful routes, shared and rated by local Scenic users worldwide. Select an area, tap 'Search' and see what comes up.' Similar to the VGI problems that Runge et al outlines, this app bases its routes on subjective public opinion rather than objective analysis. This app also lacks the features from Roadtrippers that would be useful in discerning a potential scenic route.
 
 
-<!-- ### Conclusion --!>
+<!-- ### Conclusion -->
 
 ## General Approach
 
