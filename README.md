@@ -1,6 +1,7 @@
 # Pathfinder
 
 Created: May 17, 2022 10:29 PM
+
 Status: Planning
 
 ## Goals
@@ -8,8 +9,11 @@ Status: Planning
 - Navigate: Provide people a way to enjoy their routes through customizing their scenery.
 - Explore: Provide people a way to enjoy their city through an automatic route generator.
 
+## Defintions TODO (6/8/2022)
 
 ## Justification
+
+Taking on a project such as this are relatively nontrivial and requires extensive planning and coordination. The following analysis will attempt to understand the rationale behind this project and similar work that has been done.
 
 ### Travel Industry
 
@@ -32,10 +36,11 @@ There are four major papers that specifically relate to our project. These all a
 - First, it is worth noting that Panoramio is not longer active due to privacy condcerns and was merged into Google Maps/Earth. Although this paper does not specifically work to generate a scenic route, it mainly serves as evaluating which factors influence a classification of such a route. However, it still uses the same idea of comparing the number of geo-tagged images to ranking how scenic a route is. While this is a good model for popularity, our goal with Pathfinder is to allow the user to decide whether they would like to see nature as scenery or other urban and residential districts. Another shortcoming of this project is the entire study was based on routes in California and is not a general approach. With machine learning, Pathfinder aims to generalize the concept of scenicness regardless of images found online. As mentioned before, some places do not contain images uploaded online but would still be considered scenic based on the criteria listed in this paper. Similar to GPSView, this paper lists no publicly available implementation of ranking the scenicness of a route.
 
 [Runge, N., Samsonov, P., Degraen, D., & Schöning, J. (2016). No more Autobahn! Proceedings of the 21st International Conference on Intelligent User Interfaces - IUI  ’16. doi:10.1145/2856767.2856804](https://sci-hub.se/https://doi.org/10.1145/2856767.2856804)
--  First and foremost, this project, titled "Autobahn", improves upon the previous two papers by eliminating volunteered geographic information (VGI) or images with geo-tagging. The authors of the paper recognize unequal distributions of images and tourist attraction bias. In other words, given the large amount of images at a certain location, it propmts more people to visit those locations leading to a nonuniform distrubution of images compared to its "scenicness". Rather, this paper takes a direct approach from scraping Google Street View images and classifying them with deep learning. With this classification, it decides the "scenicness" of a route in an algorithm to create a final navigation route. In this final algorithm, it takes into consideration the region of interest (ROI) and sets a maximum time limit for the route. With these factors, Autobahn uses the GraphHopper API for navigation in the United States and the OpenRouteService API for Europe. Notably, they claim to provide a demonstration of the system at the [Autobahn Project Website](http://autobahn.edm.uhasselt.be/) however the website fails to provide a valid connection. Even the link in the [WIRED article about the Autobahn project](https://www.wired.co.uk/article/scenic-sat-nav-autobahn-research) fails to load a valid page. Even the snapshots from the Wayback machine fail to properly load the page. This gives us a hint that this project was relatively exciting in the beginning but ultimately failed.
+-  First and foremost, this project, titled "Autobahn", improves upon the previous two papers by eliminating volunteered geographic information (VGI) or images with geo-tagging. The authors of the paper recognize unequal distributions of images and tourist attraction bias. In other words, given the large amount of images at a certain location, it propmts more people to visit those locations leading to a nonuniform distrubution of images compared to its "scenicness". Rather, this paper takes a direct approach from scraping Google Street View images and classifying them with deep learning. With this classification, it decides the "scenicness" of a route in an algorithm to create a final navigation route. In this final algorithm, it takes into consideration the region of interest (ROI) and sets a maximum time limit for the route. With these factors, Autobahn uses the Graph/opper API for navigation in the United States and the OpenRouteService API for Europe. Notably, they claim to provide a demonstration of the system at the [Autobahn Project Website](http://autobahn.edm.uhasselt.be/) however the website fails to provide a valid connection. Even the link in the [WIRED article about the Autobahn project](https://www.wired.co.uk/article/scenic-sat-nav-autobahn-research) fails to load a valid page. Even the snapshots from the Wayback machine fail to properly load the page. This gives us a hint that this project was relatively exciting in the beginning but ultimately failed.
 - This project is the most similar to the goals and general idea of Pathfinder in the sense that it classifies images agnostic of location and uses it to evaluate the best route given the conditions. It is able to identify "5 high-level scenic categories, namely sightseeing (e.g. viaduct, temple, amusement park), nature and woods (e.g. valley, alley, garden), fields (e.g. wheat field, corn field), water (e.g. ocean, harbor, coast) and mountain (e.g. butte, snowy mountain, volcano). The sixth category contained all non-scenic tags (e.g. street, industry and building)." Notice the last phrase when it labels street, industry, and building as non-scenic. Our goal with Pathfinder is to create a more generalized approach to scenic routes by allowing the user to specify the type of scenery. In addition to the categories of nature that Autobahn includes, we aim to allow for the user to explore residential and urban areas. Another shortcoming is the classification of the Google Street View images. Even though the model was pretrained on the notorious ImageNet dataset with one of the most popular mahcine learning models, Caffee Deep Learning Framework, there have been many advances in machine learning in the past 6 years in convolutional neural networks. The accuracy for the pretrained model was approximately 50%, which is quite good but still lacks major improvements. Another shortcoming includes the classification of the scenicness of an area into 1 km segments. The model takes identifies the most prevalent class in these segments and corresponds to about 3200 feet. Now, although this is generally not a bad idea, it lacks some detail. For a better mapping of the scenery of an area, it would be necessary to shrink the size for more specific scenery. For example, residential districts turn into business districts and vice versa quite quickly and the lack of detail would diminish the quality of the route. Finally, the classification of the Autobahn project coresponds to only about 7.5% the size of California. Pathfinder should aim to include more area eventually. The initial goal will start small but the speed of the model should be extensible to much larger regions.
 
 [Gavalas, D., Kasapakis, V., Konstantopoulos, C., Pantziou, G., & Vathis, N. (2016). Scenic route planning for tourists. Personal and Ubiquitous Computing, 21(1), 137–155. doi:10.1007/s00779-016-0971-3 ](https://sci-hub.se/https://doi.org/10.1007/s00779-016-0971-3)
+
 
 ### Similar Apps
 
@@ -46,37 +51,56 @@ There are a couple of apps in the App Store which have some similarity to the go
 - **Scenic Motorcycle Navigation**: Using the above formula, we can reasonably infer the app has received approximnately 900K downloads in the past 4 years. This app is closer the goals of creating an app that has visual appeal to the driver. Based on geographic maps, this app is able to decide the "windiness" of a route and provides a navigation system for motorcyclists. This provides a route that is somewhat scenic as winding roads tend to be accompanied with forests and nature. However, this app falls short in that it only factors the windiness of the app rather than specific visual features of the road. For example, Pathfinder aims to appeal to those wanting to see the local community by driving through residential districts. In addition, this app creates routes based on users' experiences and their opinion of a scenic route. According to their app description, "Scenic has a vast database of thousands of beautiful routes, shared and rated by local Scenic users worldwide. Select an area, tap 'Search' and see what comes up.' Similar to the VGI problems that Runge et al outlines, this app bases its routes on subjective public opinion rather than objective analysis. This app also lacks the features from Roadtrippers that would be useful in discerning a potential scenic route.
 
 
-# TODO (for 6/7/2022)
-### Conclusion
+<!-- ### Conclusion --!>
 
 ## General Approach
 
 - Create an app with two features: Explore and Navigate.
-    - Explore
+    - **Explore:** Get a tour of the city of elsewhere. Start and end destination is your current location so it’s basically an auto-guided tour.
+    	- Input: latitute, longitude, time constraint.
+	- Output: One single path between nodes (road intersections).
+    - **Navigate:** Get from point A to point B along a route customized to your preferneces. You can choose to see a residential district, nature, etc.
+    	- Input: latitude, longitude, time constraint, end latitude, end longitude, type of scenery (nature, residential, etc (still need to finalize this))
+	- Output: One single path between nodes (road intersections).
         
-         Get a tour of the city of elsewhere. Start and end destination is your current location so it’s basically an auto-guided tour.
-        
-    - Navigate
-        
-        
+### 3 Major Steps
+
+**1. Create an algorithm for ranking/enumerating scenic locations (museums, forests, state parks etc)**
+**2. Create an algorithm for ranking the scenicness feature in our desired locations.**
+	1. Identify the presence of trees, lakes, etc.
+		- Can be done with a model trained on ImageNet with Google Street View images, like Autobahn does in Runge et al.
+		- We would need to identify trees, plants, bodies of water, gardens, fields, mountains, etc.
+		- Then we would take panoramic images from Google Street View and label them with our machine learning model.
+		- This geospatial map (maybe in geojson format?) would include weights between road interesections.
+	2. Identify the type of surrounding buildings.
+		- Data can be scraped and mapped from zoning districts (by hand or algorithmically)
+**3. Create a working navigation system.**
+    1. Create a shortest/fastest route method with a simple A\* algorithm.
+    2. For Explore, use the A\* algorithm to find the shortest route between the "checkpoints" throughout the route.
+		- This could also be done with the GraphHopper API or Google Street View (GSV) API.
+    3. For Navigate, use the weights and ranking of the scenicness and factor that into the weights of the edges between nodes in the algorithm. Essentially, we would be using the scenicness value to subtract from the total $f$-value of the node.
+    	- This will require extensive tuning to ensure that all the constraints of time are met while providing an optimal scenic route.
+
+- Book on navigation algorithms "Route Planning Algorithm for Car Navigation" by Flinsenberg, Ingrid C.M. [https://brainmaster.com/software/pubs/brain/Flinsenberg Route Planning.pdf](https://brainmaster.com/software/pubs/brain/Flinsenberg%20Route%20Planning.pdf)
+
+### Notes
+- In the end we might combine the Navigate feature with the Explore one for a more personalized experience; however, that would cause a lot more overhead in terms of effort.
+- We are planning on starting with San Mateo County then extending to Bay Area -> California -> United States etc.
+- We'll write the initial project in Python given its versatility. After the proof of concept, we can migrate it down to Rust or C++.
+- Implementing a system for managing millions of nodes is seriously nontrivial. Thankfully, a team at stanford [has worked on this problem](https://snap.stanford.edu/index.html). They also have a published paper [J. Leskovec, K. Lang, A. Dasgupta, M. Mahoney. Community Structure in Large Networks: Natural Cluster Sizes and the Absence of Large Well-Defined Clusters. Internet Mathematics 6(1) 29--123, 2009.](https://arxiv.org/pdf/0810.1355.pdf).
+- SNAP also provides the dataset [California Road Network](https://snap.stanford.edu/data/roadNet-CA.html) (roadNet) which represents the road network in terms of nodes and edges. This is extremely useful in simplying the navigation problem. Furthermore, this dataset has been used in various applications such as [visualizing California's roads](https://studentwork.prattsi.org/infovis/labs/california-road-network/) or 
+
+
+
 ## Questions
 
-- How do we want to structure this app? (Should we consider other options instead of the Explore/Navigate method?)
 - Is everyone really committed to this project, or is it "just for college applications"? (This project will fail if it's built on building self-worth).
-- ~~ Will this app actually be useful to people? ~~ (answered above in [Justification](#Justification))
-
-## 3 Major Steps
-
-- Explore Create an algorithm for ranking/enumerating scenic locations (museums, forests, state parks etc)
-- Navigate Create a model that maps the Bay Area urban landscape (residential district, urban areas, parks, lakes, etc)
-    - Data needs to be scraped from "zone maps" of cities
-- Create a working navigation system of routes (nothing novel but still needs to be implemented)
-    - Book on navigation algorithms “ Route Planning Algorithm for Car Navigation" by Flinsenberg, Ingrid C.M.
-        
-        [https://brainmaster.com/software/pubs/brain/Flinsenberg Route Planning.pdf](https://brainmaster.com/software/pubs/brain/Flinsenberg%20Route%20Planning.pdf)
-        
-    - Put everything together to create a “scenic route”  that gets you to your destination by a certain time but still gives you a nice route.
-    - Also apply the ranking system to create a city explorer with no final destination
+- The entire navigation system might end up being quite computationally intensive. How can we can simplify our model and how would we improve performance if we end up deciding to create a public user demonstration?
+- How do we want to structure this app? (Should we consider other options instead of the Explore/Navigate method?)
+- Should we open source this project on Github and would that negatively impact our performance on the App Store?
+- <del>Will this app actually be useful to people?</del> (answered above in [Justification](#Justification))
 
 ## If we have time
-- Implement the above algorithms into an app (iOS, android etc)
+- Implement the above algorithms into an iOS app.
+	- iOS has some of the best potential with Apple's new MapKit API announced at Apple's World Wide Developer Conference 2022 (WWDC 2022)
+	- Programming language would be Swift.
