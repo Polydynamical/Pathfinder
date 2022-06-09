@@ -66,6 +66,8 @@ There are a couple of apps in the App Store which have some similarity to the go
 ### 3 Major Steps
 
 1. **Create an algorithm for ranking/enumerating scenic locations (museums, forests, state parks etc)**
+	1. Find a data source with all such scenic locations.
+	2. Label these data points on our node/edge file.
 2. **Create an algorithm for ranking the scenicness feature in our desired locations.**
 	1. Identify the presence of trees, lakes, etc.
 		- Can be done with a model trained on ImageNet with Google Street View images, like Autobahn does in Runge et al.
@@ -74,6 +76,8 @@ There are a couple of apps in the App Store which have some similarity to the go
 		- This geospatial map (maybe in geojson format?) would include weights between road interesections.
 	2. Identify the type of surrounding buildings.
 		- Data can be scraped and mapped from zoning districts (by hand or algorithmically)
+	3. Label our data.
+		- Add the percentage of each feature to each edge (road) in our data. We would basically expand our .csv file to include extra data for each edge.
 3. **Create a working navigation system.**
     1. Create a shortest/fastest route method with a simple A\* algorithm.
     2. For Explore, use the A\* algorithm to find the shortest route between the "checkpoints" throughout the route.
