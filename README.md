@@ -90,6 +90,7 @@ There are a couple of apps in the App Store which have some similarity to the go
 - Implementing a system for managing millions of nodes is seriously nontrivial. Thankfully, a team at stanford [has worked on this problem](https://snap.stanford.edu/index.html). They also have a published paper [J. Leskovec, K. Lang, A. Dasgupta, M. Mahoney. Community Structure in Large Networks: Natural Cluster Sizes and the Absence of Large Well-Defined Clusters. Internet Mathematics 6(1) 29--123, 2009.](https://arxiv.org/pdf/0810.1355.pdf).
 - SNAP also provides the dataset [California Road Network](https://snap.stanford.edu/data/roadNet-CA.html) (roadNet) which represents the road network in terms of nodes and edges. This is extremely useful in simplying the navigation problem. Furthermore, this dataset has been used in various applications such as [visualizing California's roads](https://studentwork.prattsi.org/infovis/labs/california-road-network/) or 
 - Google Maps also uses A\* for their navigation system but they also alter it to account for traffic lights, turns, traffic, etc. If we want to make this an end user product, we would also need to consider these factors since they are crucial in altering the time a route takes.
+- To view the road map data for San Mateo County, you can either open the .xhtml file in your browser or the .shp file in the san\_mateo\_county\_data/ directory with SolidWorks or FreeCad for Linux.
 
 
 
