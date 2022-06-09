@@ -9,7 +9,7 @@ Status: Planning
 - Navigate: Provide people a way to enjoy their routes through customizing their scenery.
 - Explore: Provide people a way to enjoy their city through an automatic route generator.
 
-## Defintions TODO (6/8/2022)
+<!-- ## Defintions TODO (6/8/2022) -->
 
 ## Justification
 
@@ -86,7 +86,7 @@ There are a couple of apps in the App Store which have some similarity to the go
 ### Notes
 - In the end we might combine the Navigate feature with the Explore one for a more personalized experience; however, that would cause a lot more overhead in terms of effort.
 - We are planning on starting with San Mateo County then extending to Bay Area -> California -> United States etc.
-- We'll write the initial project in Python given its versatility. After the proof of concept, we can migrate it down to Rust or C++.
+- We'll write the initial project in **Python 3.9** given its versatility. After the proof of concept, we can migrate it down to Rust or C++.
 - Implementing a system for managing millions of nodes is seriously nontrivial. Thankfully, a team at stanford [has worked on this problem](https://snap.stanford.edu/index.html). They also have a published paper [J. Leskovec, K. Lang, A. Dasgupta, M. Mahoney. Community Structure in Large Networks: Natural Cluster Sizes and the Absence of Large Well-Defined Clusters. Internet Mathematics 6(1) 29--123, 2009.](https://arxiv.org/pdf/0810.1355.pdf).
 - SNAP also provides the dataset [California Road Network](https://snap.stanford.edu/data/roadNet-CA.html) (roadNet) which represents the road network in terms of nodes and edges. This is extremely useful in simplying the navigation problem. Furthermore, this dataset has been used in various applications such as [visualizing California's roads](https://studentwork.prattsi.org/infovis/labs/california-road-network/) or 
 - Google Maps also uses A\* for their navigation system but they also alter it to account for traffic lights, turns, traffic, etc. If we want to make this an end user product, we would also need to consider these factors since they are crucial in altering the time a route takes.
