@@ -79,10 +79,11 @@ There are a couple of apps in the App Store which have some similarity to the go
 	3. Label our data.
 		- Add the percentage of each feature to each edge (road) in our data. We would basically expand our .csv file to include extra data for each edge.
 3. **Create a working navigation system.**
-    1. Create a shortest/fastest route method with a simple A\* algorithm.
-    2. For Explore, use the A\* algorithm to find the shortest route between the "checkpoints" throughout the route.
+    1. Get a network of roads in the respective area from US government TIGER files for each county.
+    2. Create a shortest/fastest route method with a simple A\* algorithm.
+    3. For Explore, use the A\* algorithm to find the shortest route between the "checkpoints" throughout the route.
 		- This could also be done with the GraphHopper API or Google Street View (GSV) API.
-    3. For Navigate, use the weights and ranking of the scenicness and factor that into the weights of the edges between nodes in the algorithm. Essentially, we would be using the scenicness value to subtract from the total $f$-value of the node.
+    4. For Navigate, use the weights and ranking of the scenicness and factor that into the weights of the edges between nodes in the algorithm. Essentially, we would be using the scenicness value to subtract from the total $f$-value of the node.
     	- This will require extensive tuning to ensure that all the constraints of time are met while providing an optimal scenic route.
 
 - Book on navigation algorithms "Route Planning Algorithm for Car Navigation" by Flinsenberg, Ingrid C.M. [https://brainmaster.com/software/pubs/brain/Flinsenberg Route Planning.pdf](https://brainmaster.com/software/pubs/brain/Flinsenberg%20Route%20Planning.pdf)
