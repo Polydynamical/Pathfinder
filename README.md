@@ -74,6 +74,7 @@ There are a couple of apps in the App Store which have some similarity to the go
 		- We would need to identify trees, plants, bodies of water, gardens, fields, mountains, etc.
 		- Then we would take panoramic images from Google Street View and label them with our machine learning model.
 		- This geospatial map (maybe in geojson format?) would include weights between road interesections.
+		- We can use [this](https://docs.fast.ai/examples/camvid.html) example pretrained model which has been used in [this](https://doi.org/10.1109/ACCESS.2020.3006493) paper.
 	2. Identify the type of surrounding buildings.
 		- Data can be scraped and mapped from zoning districts (by hand or algorithmically)
 	3. Label our data.
