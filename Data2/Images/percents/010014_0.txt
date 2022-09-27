@@ -1,0 +1,7 @@
+38.6%: car
+12.18%: building
+0.12%: wall
+46.56%: road
+0.13%: pole
+2.21%: sidewalk
+0.21%: traffic light

@@ -1,0 +1,9 @@
+0.02%: car
+0.0%: building
+35.94%: sky
+17.95%: vegetation
+43.48%: road
+1.88%: terrain
+0.34%: pole
+0.2%: traffic sign
+0.19%: sidewalk
