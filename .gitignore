@@ -1,5 +1,6 @@
 Data2/Images/masks/*
-!Data2/Images/masks/02*
+!Data2/Images/masks/03*
+!Data2/Images/masks/04*
 Data2/Images/percents/
 Navigate/Scenery/predict_bdd100k/zip/
 *.h5
