@@ -24,7 +24,7 @@ class LoadImage:
         results['ori_shape'] = img.shape
         return results
 
-config_file = "bdd100k-models/sem_seg/configs/sem_seg/upernet_convnext-t_fp16_512x1024_80k_sem_seg_bdd100k.py"
+config_file = "../bdd100k-models/sem_seg/configs/sem_seg/upernet_convnext-t_fp16_512x1024_80k_sem_seg_bdd100k.py"
 checkpoint_file = "upernet_convnext-t_fp16_512x1024_80k_sem_seg_bdd100k.pth"
 my_palette = {
         0: [128, 64, 128],
@@ -48,15 +48,15 @@ my_palette = {
         18: [119, 11, 32],
     }
 
-filelist = sorted(os.listdir("../../../Data/Images/img/"))
-filelist2 = sorted(os.listdir("../../../Data/Images/masks/"))
+filelist = sorted(os.listdir("../../../../Data/Images/img/"))
+filelist2 = sorted(os.listdir("../../../../Data/Images/masks/"))
 
 notinlist = []
 for i in range(0, len(filelist)):
     if i % 10000 == 0:
         print(i)
     if filelist[i] not in filelist2:
-        notinlist.append(f"../../../Data/Images/img/{filelist[i]}")
+        notinlist.append(f"../../../../Data/Images/img/{filelist[i]}")
 
 # notinlist = ["../../../Data/Images/img/043431_1.png"]
 
@@ -79,7 +79,7 @@ def finish(result, out, img):
             out[i][j] = my_palette[ele]
 
     out = np.flip(out, axis=2)
-    cv2.imwrite(f"../../../Data/Images/masks/{img.split('img/')[1]}", out)
+    cv2.imwrite(f"../../../../Data/Images/masks/{img.split('img/')[1]}", out)
 
 for img in tqdm.tqdm(notinlist):
     data = []
@@ -97,7 +97,7 @@ for img in tqdm.tqdm(notinlist):
 
 
 """
-    cv2.imwrite(f"../../../Data/Images/masks/{img.split('img/')[1]}", out)
+    cv2.imwrite(f"../../../../Data/Images/masks/{img.split('img/')[1]}", out)
 #for myfile in tqdm.tqdm(notinlist):
 #out = np.empty((512, 512, 3))
 
@@ -112,7 +112,7 @@ out = np.flip(out, axis=2)
 cv2.imwrite(f"./{myfile}", out)
 
 #    end = datetime.now()
-#    cv2.imwrite(f"../../../Data/Images/masks/{myfile}", result)
+#    cv2.imwrite(f"../../../../Data/Images/masks/{myfile}", result)
 
-#    model.show_result(f"../../../Data/Images/img/{myfile}", result, my_palette, show=False, out_file=f"../../../Data/Images/masks/{myfile}", opacity=1.0)
+#    model.show_result(f"../../../../Data/Images/img/{myfile}", result, my_palette, show=False, out_file=f"../../../../Data/Images/masks/{myfile}", opacity=1.0)
 """

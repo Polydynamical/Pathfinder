@@ -3,7 +3,7 @@ from mmseg.core.evaluation import get_palette
 import tqdm
 import os
 
-config_file = "bdd100k-models/sem_seg/configs/sem_seg/upernet_convnext-t_fp16_512x1024_80k_sem_seg_bdd100k.py"
+config_file = "../bdd100k-models/sem_seg/configs/sem_seg/upernet_convnext-t_fp16_512x1024_80k_sem_seg_bdd100k.py"
 checkpoint_file = "upernet_convnext-t_fp16_512x1024_80k_sem_seg_bdd100k.pth"
 my_palette = [                                                                                                                                                                                                              
     [128, 64, 128],
@@ -28,13 +28,20 @@ my_palette = [
 ]
 
 # build the model from a config file and a checkpoint file
-model = init_segmentor(config_file, checkpoint_file, device='cpu')
+model = init_segmentor(config_file, checkpoint_file, device='cuda')
 
-filelist = sorted(os.listdir("../../../Data/Images/img/"))
-filelist2 = sorted(os.listdir("../../../Data/Images/masks/"))
-for myfile in tqdm.tqdm(filelist):
-    if myfile in filelist2:
+filelist = sorted(os.listdir("../../../../Data/Images/img/"))
+filelist2 = sorted(os.listdir("../../../../Data/Images/masks/"))
+
+notinlist = []
+for i in range(0, len(filelist)):
+    if i % 10000 == 0:
+        print(i)
+    if filelist[i] in filelist2:
         continue
-    result = inference_segmentor(model, f"../../../Data/Images/img/{myfile}")
+    notinlist.append(filelist[i])
 
-    model.show_result(f"../../../Data/Images/img/{myfile}", result, my_palette, show=False, out_file=f"../../../Data/Images/masks/{myfile}", opacity=1.0)
+for myfile in tqdm.tqdm(notinlist):
+    result = inference_segmentor(model, f"../../../../Data/Images/img/{myfile}")
+
+    model.show_result(f"../../../../Data/Images/img/{myfile}", result, my_palette, show=False, out_file=f"../../../../Data/Images/masks/{myfile}", opacity=1.0)
