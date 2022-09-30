@@ -34,7 +34,7 @@ filelist = sorted(os.listdir("../../../../Data/Images/img/"))
 filelist2 = sorted(os.listdir("../../../../Data/Images/masks/"))
 
 notinlist = []
-for i in range(1, len(filelist), 2):
+for i in range(0, len(filelist)):
     if i % 10000 == 0:
         print(i)
     if filelist[i] in filelist2:
