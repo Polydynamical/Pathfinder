@@ -1,0 +1,10 @@
+0.02%: truck
+1.0%: car
+0.39%: building
+9.51%: sky
+1.5%: wall
+40.57%: vegetation
+40.17%: road
+6.1%: terrain
+0.03%: pole
+0.73%: fence

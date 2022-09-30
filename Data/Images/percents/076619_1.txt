@@ -1,0 +1,5 @@
+0.01%: train
+2.19%: sky
+54.79%: vegetation
+27.21%: road
+15.8%: terrain

@@ -1,0 +1,6 @@
+0.0%: train
+2.29%: sky
+65.76%: vegetation
+26.67%: road
+5.26%: terrain
+0.02%: traffic sign

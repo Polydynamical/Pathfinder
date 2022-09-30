@@ -1,0 +1,9 @@
+0.02%: car
+52.2%: building
+0.0%: bicycle
+19.87%: road
+1.38%: pole
+0.11%: fence
+0.81%: person
+0.21%: traffic sign
+25.4%: sidewalk

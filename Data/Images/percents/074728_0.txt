@@ -1,0 +1,11 @@
+0.61%: truck
+0.42%: car
+1.72%: building
+44.4%: sky
+0.0%: wall
+5.62%: vegetation
+45.65%: road
+1.11%: terrain
+0.28%: pole
+0.16%: traffic sign
+0.03%: sidewalk

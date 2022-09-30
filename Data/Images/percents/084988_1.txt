@@ -1,0 +1,5 @@
+0.18%: car
+55.88%: building
+43.82%: road
+0.1%: sidewalk
+0.01%: traffic light
