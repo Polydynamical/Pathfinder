@@ -1,3 +1,5 @@
-wget
 tqdm
-snap-stanford
+mmsegmentation
+mmcls
+mmcv
+mmcv-full
