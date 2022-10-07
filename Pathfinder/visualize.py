@@ -1,6 +1,12 @@
-from dsplot.graph import Graph
-import json
+from shapely.geometry import LineString, mapping
+import geopandas as gpd
+from matplotlib import pyplot as plt
 
-tree = json.loads(open("../Data/Nodes/san_mateo_county_adjacency_list.txt").read())
-graph = Graph(tree, directed=False)
-graph.plot()
+line_shapes = "../Data/Nodes/tiger/tl_2021_06081_roads.shp"
+
+gdf = gpd.read_file(line_shapes) #POINTS
+
+gdf.plot(figsize=(200,50))
+
+plt.savefig('out.png')
+plt.show()

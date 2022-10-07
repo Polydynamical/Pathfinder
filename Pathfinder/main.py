@@ -1,11 +1,17 @@
 import sys
+import os
 import json
 from math import pi, cos, asin, sqrt
 import numpy as np
 from datetime import datetime
+from shapely.geometry import LineString, mapping
+import geopandas as gpd
+from matplotlib import pyplot as plt
+
 
 start = sys.argv[1]
 end = sys.argv[2]
+margin = int(sys.argv[3])
 
 starttime = datetime.now()
 print("Loading Data...")
@@ -15,19 +21,26 @@ print(f"Data loading took {endtime-starttime}s!\n")
 
 # heuristic = {'S': 8, 'A': 8, 'B': 4, 'C': 3, 'D': 5000, 'E': 5000, 'G': 0}
 
-def distance(latlon1, latlon2):
+total_distance = float('inf')
+
+def distance(latlon1, latlon2, margin):
     lat1, lon1 = latlon1.split(",")
     lat2, lon2 = latlon2.split(",")
     lat1, lon1, lat2, lon2 = float(lat1), float(lon1), float(lat2), float(lon2)
     p = pi/180
     a = 0.5 - cos( (lat2 - lat1) * p)/2 + cos(lat1 * p) * cos(lat2 * p) * (1 - cos((lon2 - lon1) * p))/2
-    return 2 * 3958.8 * asin(sqrt(a))
+    d = 2 * 3958.8 * asin(sqrt(a))
+    if d - margin > total_distance:
+        return float('inf')
+    return d
+
+total_distance = distance(start, end, margin)
 
 print(f"Starting heuristic calculations...")
 starttime = datetime.now()
 heuristic = {}
 for coord in tree.keys():
-    heuristic[coord] = distance(coord, end)
+    heuristic[coord] = distance(coord, end, margin)
 endtime = datetime.now()
 print(f"Heuristic Calculations took {endtime-starttime}s!\n")
 
@@ -86,6 +99,21 @@ def AStarSearch():
 
     return closed, optimal_sequence
 
+def visualize(x, y):
+    x_ticks = [-122.50, -122.45, -122.40, -122.35, -122.30, -122.25, -122.20, -122.15, -122.10]
+    y_ticks = [37.1, 37.2, 37.3, 37.4, 37.5, 37.6, 37.7]
+    line_shapes = "../Data/Nodes/tiger/tl_2021_06081_roads.shp"
+
+    gdf = gpd.read_file(line_shapes) #POINTS
+
+    gdf.plot(figsize=(300,100))
+    plt.xlim([-122.60, -122.00])
+    plt.ylim([37.0, 37.8])
+    plt.plot(x, y, color='red')
+    filename = f'{start}_to_{end}_radius_{margin}.png'
+    plt.savefig(filename)
+    os.system(f"feh {filename}")
+
 def main():
     print("Starting A* Search...")
     starttime = datetime.now()
@@ -93,8 +121,12 @@ def main():
     endtime = datetime.now()
     print(f"A* Search took {endtime-starttime}s over {count} iterations!\n")
 #    print('visited nodes: ' + str(visited_nodes))
-    for x in optimal_nodes:
+    for i, x in enumerate(optimal_nodes):
         print(x)
+        optimal_nodes[i] = [float(x.split(",")[0]), float(x.split(",")[1])]
+
+    optimal_nodes = np.asarray(optimal_nodes)
+    visualize(optimal_nodes[:,1], optimal_nodes[:,0])
 #    print('optimal nodes sequence: ' + str(optimal_nodes))
 
 if __name__ == '__main__':

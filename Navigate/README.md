@@ -10,6 +10,7 @@ I FOUND WHAT WE NEED!!!!
 ## Info
 - We can use Google Street View images.
 - For each
+- trained on google colab
 
 ## Papers
 - [https://senseable.mit.edu/treepedia/treepedia_publication.pdf](https://senseable.mit.edu/treepedia/treepedia_publication.pdf)

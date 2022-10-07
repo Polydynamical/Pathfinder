@@ -7,3 +7,16 @@ Generally speaking, we will likely implement an altered A\* algorithm given its 
 We should:
 - LImit the search space for the algorithm based on heuristics
 	- I.e. we calculate the distance to the end of each point in the graph (we could do the same for the search) and we should simply remove points that are outside of a certain user-defined radius. (also maybe convert to time of route based on mileage)
+
+
+Precompute scenicness of all edges (between any two nodes) and ouptut 
+General strategy:
+
+- Find the shortest path between two nodes (done)
+- Create a bubble around the shortest path from a user defined limit to limit where the car can go
+- Find subpaths with high scenicness (i.e. from one node to another with high vegetation)
+- PERCOLATION?!?
+- Find the least cost path between edges in the scenic bubble.
+	- Find 
+- Outputted path is the path to be taken
+
