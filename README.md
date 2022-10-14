@@ -6,14 +6,14 @@ Status: In Progress
 
 ## Goals
 
-- Navigate: Provide people a way to enjoy their routes through customizing their scenery.
-- Explore: Provide people a way to enjoy their city through an automatic route generator.
+- Navigate: Provide people a way to enjoy their routes through customizing their scenery. (point A to point B customization)
+- Explore:  Provide people a way to enjoy their city through an automatic route generator. (point A back to point A auto-generated)
 
 <!-- ## Defintions TODO (6/8/2022) -->
 
 ## Justification
 
-Taking on a project such as this are relatively nontrivial and requires extensive planning and coordination. The following analysis will attempt to understand the rationale behind this project and similar work that has been done.
+Taking on a project such as this is relatively nontrivial and requires extensive planning and coordination. The following analysis will attempt to understand the rationale behind this project and similar work that has been done.
 
 ### Travel Industry
 
@@ -23,7 +23,9 @@ The travel industry is one of the most important aspects of the US economy. In 2
 
 These statistics clearly demonstrate that there is an market for our app. 
 
-### Similar Papers
+A potential idea is to also expand/merge this project with another company to implement into a navigation app. That way, rather than creating a competing navigation app, we simply add the feature to an already existing app.
+
+### Related Work
 
 There are four major papers that specifically relate to our project. These all are all related to creating the best scenic route. These papers are also listed in chronological order which helps us understand the progression of research.
 
@@ -68,24 +70,32 @@ There are a couple of apps in the App Store which have some similarity to the go
 1. **Create an algorithm for ranking/enumerating scenic locations (museums, forests, state parks etc)**
 	1. Find a data source with all such scenic locations.
 	2. Label these data points on our node/edge file.
-2. **Create an algorithm for ranking the scenicness feature in our desired locations.**
-	1. Identify the presence of trees, lakes, etc.
+2. **Create an algorithm for ranking the scenicness feature in our desired locations.** (done)
+	1. Identify the presence of trees, lakes, etc (done).
 		- Can be done with a model trained on ImageNet with Google Street View images, like Autobahn does in Runge et al.
 		- We would need to identify trees, plants, bodies of water, gardens, fields, mountains, etc.
 		- Then we would take panoramic images from Google Street View and label them with our machine learning model.
 		- This geospatial map (maybe in geojson format?) would include weights between road interesections.
 		- We can use [this](https://docs.fast.ai/examples/camvid.html) example pretrained model which has been used in [this](https://doi.org/10.1109/ACCESS.2020.3006493) paper.
-	2. Identify the type of surrounding buildings.
+		- 10/13/22: After further work, I decided to use Facebook's upernet convnext model pretrained on the bdd100k dataset and made ~250K inferences in Google Colab.
+	2. Identify the type of surrounding buildings. (TODO)
 		- Data can be scraped and mapped from zoning districts (by hand or algorithmically)
-	3. Label our data.
+	3. Label our data. (done)
 		- Add the percentage of each feature to each edge (road) in our data. We would basically expand our .csv file to include extra data for each edge.
-3. **Create a working navigation system.**
-    1. Get a network of roads in the respective area from US government TIGER files for each county.
-    2. Create a shortest/fastest route method with a simple A\* algorithm.
-    3. For Explore, use the A\* algorithm to find the shortest route between the "checkpoints" throughout the route.
+3. **Create a working navigation system.** (done)
+    1. Get a network of roads in the respective area from US government TIGER files for each county. (done)
+    2. Create a shortest/fastest route method with a simple A\* algorithm. (done)
+    3. For Explore, use the A\* algorithm to find the shortest route between the "checkpoints" throughout the route. (done)
 		- This could also be done with the GraphHopper API or Google Street View (GSV) API.
     4. For Navigate, use the weights and ranking of the scenicness and factor that into the weights of the edges between nodes in the algorithm. Essentially, we would be using the scenicness value to subtract from the total $f$-value of the node.
     	- This will require extensive tuning to ensure that all the constraints of time are met while providing an optimal scenic route.
+	- UPDATE: 10/13/22: The problem with simply using the scenicness as the heuristic is that A* is built around finding the shortest path. I.e. it will start at its current node and just incrementally edge closer to the goal node. 
+	- For a scenic pathfinding algorithm, we need an omniscient view of the map to find the optimal path. One idea for this is using Percolation theory. Check out the Pathfinder/Percolation directory (will merge into parent directory if it works. 
+	- The basic concept of percolation theory is that if we have a 2-dimensional set of nodes on a graph with randomly generated weights on edges, there exists a maximum critical parameter, p, at which all the nodes would be fully connected. In a scenario with edge values randomly generated between 0 and 1, the p-value is 0.5 This means that if the p-value is exactly 0.5, there will always be a path between two nodes. If the p-value is above 0.5, this is not necessarily true. 
+	- The idea is to treat our road graph with scenic edges and find the highest possible critical parameter. this would be achieved by removing all connections with a weight too low and find the best possible connection between scenic paths. 
+	- [Here](https://web.mit.edu/ceder/publications/Percolation.pdf) is an excellent introduction to the basics of Percolation theory.
+	- Note that this is simply an idea and I plan on exploring other aspects of graph theory and thinking critically (no pun intended) about incorporating interdisplinary methods into optimizing this project.
+	  
 
 - Book on navigation algorithms "Route Planning Algorithm for Car Navigation" by Flinsenberg, Ingrid C.M. [https://brainmaster.com/software/pubs/brain/Flinsenberg Route Planning.pdf](https://brainmaster.com/software/pubs/brain/Flinsenberg%20Route%20Planning.pdf)
 
@@ -101,10 +111,10 @@ There are a couple of apps in the App Store which have some similarity to the go
 
 ## Questions
 
-- Is everyone really committed to this project, or is it "just for college applications"? (This project will fail if it's built on building self-worth).
-- The entire navigation system might end up being quite computationally intensive. How can we can simplify our model and how would we improve performance if we end up deciding to create a public user demonstration?
+- The entire navigation system might end up being quite computationally intensive. How can we can simplify our model and how would we improve performance if we end up deciding to create a public user demonstration? (10/13/22: just be more patient or use Google colab/cloud)
 - How do we want to structure this app? (Should we consider other options instead of the Explore/Navigate method?)
 - Should we open source this project on Github and would that negatively impact our performance on the App Store?
+- <del>Is everyone really committed to this project, or is it "just for college applications"? (This project will fail if it's built on building self-worth).</del> It's just me now :)
 - <del>Will this app actually be useful to people?</del> (answered above in [Justification](#Justification))
 
 ## If we have time

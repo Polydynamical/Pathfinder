@@ -15,7 +15,7 @@ margin = int(sys.argv[3])
 
 starttime = datetime.now()
 print("Loading Data...")
-tree = json.loads(open("../Data/Nodes/san_mateo_county_adjacency_list.txt").read())
+tree = json.loads(open("../Data/Nodes/adjacency_lists/100vegetation.txt").read())
 endtime = datetime.now()
 print(f"Data loading took {endtime-starttime}s!\n")
 
