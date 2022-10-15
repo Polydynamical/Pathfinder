@@ -85,7 +85,7 @@ def visualize(x, y):
     plt.xlim([-122.60, -122.00])
     plt.ylim([37.0, 37.8])
     plt.scatter(x, y, color='red')
-    filename = f'p{critical_value}_{basefilename}_{start}_{end}.png'
+    filename = f'out/p{critical_value}_{basefilename}_{start}_{end}.png'
     plt.savefig(filename)
 
     # must have the "feh" image viewer
