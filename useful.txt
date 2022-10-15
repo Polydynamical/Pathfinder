@@ -1,0 +1,2 @@
+- install feh
+- alias a="python3 main.py 37.517932,-122.30976 37.449949,-122.260339 10"
