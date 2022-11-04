@@ -95,6 +95,8 @@ There are a couple of apps in the App Store which have some similarity to the go
 	- The idea is to treat our road graph with scenic edges and find the highest possible critical parameter. this would be achieved by removing all connections with a weight too low and find the best possible connection between scenic paths. 
 	- [Here](https://web.mit.edu/ceder/publications/Percolation.pdf) is an excellent introduction to the basics of Percolation theory.
 	- Note that this is simply an idea and I plan on exploring other aspects of graph theory and thinking critically (no pun intended) about incorporating interdisplinary methods into optimizing this project.
+	- Next, implmement an algorithm that will maximize the amount of scenic nodes visited under a certain limit
+	- With knowing exactly which scenic nodes to visit, feed these back into an A* algorithm that will find the shortest path between everything 
 	  
 
 - Book on navigation algorithms "Route Planning Algorithm for Car Navigation" by Flinsenberg, Ingrid C.M. [https://brainmaster.com/software/pubs/brain/Flinsenberg Route Planning.pdf](https://brainmaster.com/software/pubs/brain/Flinsenberg%20Route%20Planning.pdf)
