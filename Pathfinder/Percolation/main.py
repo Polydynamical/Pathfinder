@@ -14,12 +14,11 @@ from math import radians, degrees, pi, acos, cos, sin, asin, atan2, sqrt
 
 R = 3958.899 # Radius of earth in miles
 
-# bring in A*
-
 # ('[float0],[float1]') -> (float0, float1)
 def str_to_tuple(tmp: str) -> tuple:
     return tuple([float(x) for x in tuple(tmp.split(","))])
 
+# (float0, float1) -> ('[float0],[float1]')
 def tuple_to_str(tmp: tuple) -> str:
     return str(tmp).replace("(","").replace(")","").replace(" ","")
 
@@ -28,6 +27,7 @@ end = sys.argv[2]
 # margin = float(sys.argv[3]) # Maybe develop algorithm to set margin based on distance to destination. Maybe 1.5 times the distance? Or maybe based on # of nodes/time. YUP (see "find reasonable clusters" in "percolation search" below. (Use a circle as radius from midpoint of start/end nodes))
 e = float(sys.argv[3]) # eccentricity of ellipse bound
 p = float(sys.argv[4])
+no_percolated_clusters = int(sys.argv[5])
 
 
 # TODO: use newton's method to find optimal critical value?!!
@@ -39,7 +39,7 @@ starttime = datetime.now()
 print("Loading Data...")
 basefilename = "100vegetation"
 original_tree = dict(json.loads(open(f"../../Data/Nodes/adjacency_lists/{basefilename}.txt").read())) # no pun intended
-tree = original_tree.copy()
+#tree = original_tree.copy()
 
 
 # data :=  parent_node: **[**[adjacent_node, scenicness_to_parent_node]]
@@ -85,33 +85,15 @@ def midpoint(latlon1: str, latlon2: str) -> str:
 # (Simply adding a margin will not work for obscure routes. I.e. where 
 # (shortest drivable distance) >>>> (Euclidean distance) )
 
-"""
-print(len(tree.items()))
-for i, x in enumerate(tree.copy().items()):
-    for adj_node in x[1]:
-        if distance(start, adj_node[0]) > margin:
-            tree.pop(x[0])
-print(len(tree.items()))
-"""
+#print(len(tree.items()))
+#for i, x in enumerate(tree.copy().items()):
+#    for adj_node in x[1]:
+#        if distance(start, adj_node[0]) > margin:
+#            tree.pop(x[0])
+#print(len(tree.items()))
 
 
 # Let's eliminate nodes below our critical value! (remove unfavorable scenery)
-
-print(f"# of Regular Nodes: {len(tree.items())}")
-
-for i, x in tqdm.tqdm(enumerate(list(original_tree.items())), desc="Scenic Nodes"):
-    if x[0] == start or x[0] == end:
-        continue
-    x1 = x[1].copy()
-    for j, y in enumerate(x1):
-#        if y[0] == start or y[0] == end:
-#            continue
-        if y[1] < critical_value:
-            tree[x[0]].remove(y)
-            if len(tree[x[0]]) == 0:
-                del tree[x[0]]
-
-print(f"# of Scenic Nodes: {len(tree.items())}")
 
 # TODO: make this function into a class
 def visualize(coords):
@@ -134,6 +116,136 @@ def visualize(coords):
 
     # must have the "feh" image viewer
 #    os.system(f"feh {filename}")
+
+
+
+
+
+
+
+# TODO: UPDATE COMMENTS
+# Calculate distance of average cluster value to start and end (use margins + stuff)
+# Also remove all clusters outside of range
+# It should:
+#   1. exclude clusters in the opposite direction of goal node (behind start node)
+#   2. exclude clusters way too far away
+
+# We can solve all of these problems by finding the midpoint of the direct connection between start and end, then setting the radius to connection/2. 
+# consider changing to ellipse
+
+tree = {}
+
+# find midpoint
+endpoints_midpoint = midpoint(start, end)
+
+start_to_midpoint = distance(start, endpoints_midpoint)
+
+lat_start = float(start.split(",")[0])
+lon_start = float(start.split(",")[1])
+lat_end = float(end.split(",")[0])
+lon_end = float(end.split(",")[1])
+lat_mid = float(endpoints_midpoint.split(",")[0])
+lon_mid = float(endpoints_midpoint.split(",")[1])
+
+a = total_distance / 2
+b = sqrt( (a ** 2) * ( 1 - e ** 2) )
+rot = atan2(sin(lon_end - lon_start) * cos(lat_end), cos(lat_start) * sin(lat_end) - sin(lat_start) * cos(lat_end) * cos(lon_end - lon_start))
+
+# See https://math.stackexchange.com/questions/3747965/points-within-an-ellipse-on-the-globe
+for i, item in tqdm.tqdm(enumerate(original_tree.items()), desc="Finding Coordinates in Range"):
+
+    coord = str_to_tuple(item[0])
+
+    lat2 = coord[0]
+    lon2 = coord[1]
+
+    # theta = acos(-2 * haversine_from_coords(lat_start, lat2, lon_start, lon2) + 1) # angle between startpoint, midpoint, and cluster average point
+    # radius = b / sqrt(1 - (e * cos(theta - rot)) ** 2)
+
+    theta = radians(90 - lat_mid)
+    phi = radians(lon_mid)
+    alpha = - rot
+    c = sqrt(a**2 - b**2)
+    gamma = c / R
+
+
+    f1_x = R * (cos(alpha) * sin(gamma) * cos(phi) * cos(theta) - sin(alpha) * sin(gamma) * sin(phi) + cos(gamma) * cos(phi) * sin(theta))
+    f1_y = R * (cos(alpha) * sin(gamma) * sin(phi) * cos(theta) + sin(alpha) * sin(gamma) * cos(phi) + cos(gamma) * sin(phi) * sin(theta))
+    f1_z = R * (cos(gamma) * cos(theta) - cos(alpha) * sin(gamma) * sin(theta))
+
+    f2_x = R * (-cos(alpha) * sin(gamma) * cos(phi) * cos(theta) + sin(alpha) * sin(gamma) * sin(phi) + cos(gamma) * cos(phi) * sin(theta))
+    f2_y = R * (-cos(alpha) * sin(gamma) * sin(phi) * cos(theta) - sin(alpha) * sin(gamma) * cos(phi) + cos(gamma) * sin(phi) * sin(theta))
+    f2_z = R * (cos(gamma) * cos(theta) + cos(alpha) * sin(gamma) * sin(theta))
+
+    f1 = (f1_x, f1_y, f1_z)
+    f2 = (f2_x, f2_y, f2_z)
+
+    f1 = (atan2(f1[1], f1[0]), atan2(f1[2], sqrt(f1[0]**2 + f1[1]**2)))
+    f2 = (atan2(f2[1], f2[0]), atan2(f2[2], sqrt(f2[0]**2 + f2[1]**2)))
+
+    f1 = (degrees(f1[1]), degrees(f1[0]))
+    f2 = (degrees(f2[1]), degrees(f2[0]))
+
+    d1 = distance(tuple_to_str(coord), tuple_to_str(f1))
+    d2 = distance(tuple_to_str(coord), tuple_to_str(f2))
+
+    if d1 + d2 <= 2 * a:
+        tree[item[0]] = item[1]
+
+     
+#    if distance(tuple_to_str(cluster_avg[i]), endpoints_midpoint) <= radius: # FIX
+#        cluster_good.append(cluster)
+
+print(f"# of Coordinates in Range: {len(tree.items())}")
+
+# Visualize Good Coordinates
+expand_coord_good = []
+for coord in tree.keys():
+    expand_coord_good.append(list(str_to_tuple(coord)))
+
+# visualize(expand_coord_good)
+
+# Visualize Boundary
+
+#boundary_arr = []
+#
+#lat_mid = radians(lat_mid)
+#lon_mid = radians(lon_mid)
+#
+#for theta in range(0, 360):
+#
+#    theta = radians(float(theta))
+#
+#    radius = b / sqrt(1 - (e * cos(theta - rot) ) ** 2 )
+#
+#    delta = radius / R
+#
+#    lat2 = asin( sin(lat_mid) * cos(delta) + cos(lat_mid) * sin(delta) * cos(theta))
+#    lon2 = lon_mid + atan2(sin(theta) * sin(delta) * cos(lat_mid), cos(delta) - sin(lat_mid) * sin(lat2))
+#
+#    boundary_arr.append([degrees(lat2), degrees(lon2)])
+
+# visualize(boundary_arr)
+
+
+###########################
+
+print(f"# of Regular Nodes: {len(tree.items())}")
+
+for i, x in tqdm.tqdm(enumerate(list(tree.copy().items())), desc="Finding Scenic Nodes"):
+    if x[0] == start or x[0] == end:
+        continue
+    x1 = x[1].copy()
+    for j, y in enumerate(x1):
+#        if y[0] == start or y[0] == end:
+#            continue
+        if y[1] < critical_value:
+            tree[x[0]].remove(y)
+            if len(tree[x[0]]) == 0:
+                del tree[x[0]]
+
+print(f"# of Scenic Nodes: {len(tree.items())}")
+
 
 scenic_nodes = [x[0] for x in tree.items()]
 
@@ -169,6 +281,11 @@ for i, location in enumerate(scenic_tuple_nodes):
 # IDEA: GRadient search. Think of each node/edge with an elevation point and find the overall "deepest" route. (BACKPROPGATION?!)
 
 
+## Dead Ends 
+# We can remove dead ends by iteratively removing nodes with only 1 adjcacent node until none are left.
+
+
+
 
 #### Percolation Search ####
 
@@ -181,7 +298,7 @@ for i, location in enumerate(scenic_tuple_nodes):
 # Then we should measure the distanec to a cluster frmo the start and end location and figure out if it's worth it
 
 clusters = []
-for scenic_node in tqdm.tqdm(scenic_tuple_nodes, desc="Scenic Clusters"):
+for scenic_node in tqdm.tqdm(scenic_tuple_nodes, desc="Finding Scenic Clusters"):
     tmp = [scenic_node]
     for adjacent_scenic_node in tree[tuple_to_str(scenic_node)]:
         if (tmp2 := tuple([float(x) for x in str_to_tuple(adjacent_scenic_node[0])])) in scenic_tuple_nodes:
@@ -215,114 +332,15 @@ for cluster in clusters:
 
     cluster_avg.append((lat, lon))
 
-# Calculate distance of average cluster value to start and end (use margins + stuff)
-# Also remove all clusters outside of range
-# It should:
-#   1. exclude clusters in the opposite direction of goal node (behind start node)
-#   2. exclude clusters way too far away
-
-# We can solve all of these problems by finding the midpoint of the direct connection between start and end, then setting the radius to connection/2. 
-# consider changing to ellipse
-cluster_good = []
-
-# find midpoint
-endpoints_midpoint = midpoint(start, end)
-
-start_to_midpoint = distance(start, endpoints_midpoint)
-
-lat_start = float(start.split(",")[0])
-lon_start = float(start.split(",")[1])
-lat_end = float(end.split(",")[0])
-lon_end = float(end.split(",")[1])
-lat_mid = float(endpoints_midpoint.split(",")[0])
-lon_mid = float(endpoints_midpoint.split(",")[1])
-
-a = total_distance / 2
-b = sqrt( (a ** 2) * ( 1 - e ** 2) )
-rot = atan2(sin(lon_end - lon_start) * cos(lat_end), cos(lat_start) * sin(lat_end) - sin(lat_start) * cos(lat_end) * cos(lon_end - lon_start))
-
-# See https://math.stackexchange.com/questions/3747965/points-within-an-ellipse-on-the-globe
-for i, cluster in tqdm.tqdm(enumerate(clusters), desc="Clusters in Range"):
-
-    lat2 = cluster_avg[i][0]
-    lon2 = cluster_avg[i][1]
-
-    # theta = acos(-2 * haversine_from_coords(lat_start, lat2, lon_start, lon2) + 1) # angle between startpoint, midpoint, and cluster average point
-    # radius = b / sqrt(1 - (e * cos(theta - rot)) ** 2)
-
-    theta = radians(90 - lat_mid)
-    phi = radians(lon_mid)
-    alpha = - rot
-    c = sqrt(a**2 - b**2)
-    gamma = c / R
-
-
-    f1_x = R * (cos(alpha) * sin(gamma) * cos(phi) * cos(theta) - sin(alpha) * sin(gamma) * sin(phi) + cos(gamma) * cos(phi) * sin(theta))
-    f1_y = R * (cos(alpha) * sin(gamma) * sin(phi) * cos(theta) + sin(alpha) * sin(gamma) * cos(phi) + cos(gamma) * sin(phi) * sin(theta))
-    f1_z = R * (cos(gamma) * cos(theta) - cos(alpha) * sin(gamma) * sin(theta))
-
-    f2_x = R * (-cos(alpha) * sin(gamma) * cos(phi) * cos(theta) + sin(alpha) * sin(gamma) * sin(phi) + cos(gamma) * cos(phi) * sin(theta))
-    f2_y = R * (-cos(alpha) * sin(gamma) * sin(phi) * cos(theta) - sin(alpha) * sin(gamma) * cos(phi) + cos(gamma) * sin(phi) * sin(theta))
-    f2_z = R * (cos(gamma) * cos(theta) + cos(alpha) * sin(gamma) * sin(theta))
-
-    f1 = (f1_x, f1_y, f1_z)
-    f2 = (f2_x, f2_y, f2_z)
-
-    f1 = (atan2(f1[1], f1[0]), atan2(f1[2], sqrt(f1[0]**2 + f1[1]**2)))
-    f2 = (atan2(f2[1], f2[0]), atan2(f2[2], sqrt(f2[0]**2 + f2[1]**2)))
-
-    f1 = (degrees(f1[1]), degrees(f1[0]))
-    f2 = (degrees(f2[1]), degrees(f2[0]))
-
-    d1 = distance(tuple_to_str(cluster_avg[i]), tuple_to_str(f1))
-    d2 = distance(tuple_to_str(cluster_avg[i]), tuple_to_str(f2))
-
-    if d1 + d2 <= 2 * a:
-        cluster_good.append(cluster)
-
-     
-#    if distance(tuple_to_str(cluster_avg[i]), endpoints_midpoint) <= radius: # FIX
-#        cluster_good.append(cluster)
-
-# print(f"# of Clusters in Range: {len(cluster_good)}")
-
-# Visualize Good Clusters
-expand_cluster_good = []
-for cluster in cluster_good:
-    for coord in cluster:
-        expand_cluster_good.append(list(coord))
-
-# visualize(expand_cluster_good)
-
-# Visualize Boundary
-
-boundary_arr = []
-
-lat_mid = radians(lat_mid)
-lon_mid = radians(lon_mid)
-
-for theta in range(0, 360):
-
-    theta = radians(float(theta))
-
-    radius = b / sqrt(1 - (e * cos(theta - rot) ) ** 2 )
-
-    delta = radius / R
-
-    lat2 = asin( sin(lat_mid) * cos(delta) + cos(lat_mid) * sin(delta) * cos(theta))
-    lon2 = lon_mid + atan2(sin(theta) * sin(delta) * cos(lat_mid), cos(delta) - sin(lat_mid) * sin(lat2))
-
-    boundary_arr.append([degrees(lat2), degrees(lon2)])
-
-# visualize(boundary_arr)
-
 ## Randomize Clusters ##
-# This should randomly pick clusters along the route
+# This should randomly pick clusters along the route BUT TODO: should not go to dead ends
 # Should not exceed X amount of nodes
 
-percolated_clusters = list(cluster_good)
+percolated_clusters = list(clusters)
 shuffle(percolated_clusters)
-percolated_clusters = percolated_clusters[0: min(len(percolated_clusters), 20)]
+shuffle(percolated_clusters)
+shuffle(percolated_clusters)
+percolated_clusters = percolated_clusters[0: min(len(percolated_clusters), no_percolated_clusters)]
 
 # Visualize Good Percolated Clusters
 expand_percolated_clusters = []
@@ -332,38 +350,43 @@ for cluster in percolated_clusters:
 
 #visualize(cluster_avg + boundary_arr)
 #visualize(boundary_arr + scenic_nodes)
-#visualize(expand_cluster_good + boundary_arr)
+# visualize(expand_cluster_good + boundary_arr)
 
-visualize(expand_percolated_clusters + boundary_arr)
+# visualize(expand_percolated_clusters + boundary_arr)
 
 
 
-plt.show()
-exit(0)
 
 ## Path ##
 # Sorted list of distances from start to average cluster coordinates
+# Problem: It picks points near dead ends. AVOID RETRACING ROUTE
 dist_start_to_clusters = []
 for cluster in percolated_clusters:
-    pass
+    dist_start_to_clusters.append(distance(tuple_to_str(cluster[0]), start))
+dist_start_to_clusters, percolated_clusters = zip(*sorted(zip(dist_start_to_clusters, percolated_clusters), key=lambda x: x[0]))
+
 
 # Q: Which point in the cluster do we go to?
 # A* from start to cluster 1.
 
 
-print(f"Starting heuristic calculations...")
-starttime = datetime.now()
-heuristic = {}
-for coord in tqdm.tqdm(original_tree.keys(), desc="Heuristic Calculations"):
-    heuristic[coord] = distance(coord, end)
-endtime = datetime.now()
-print(f"Heuristic Calculations took {endtime-starttime}s!\n")
-
-cost = {start: 0}             # total cost for nodes visited
 
 
-def AStarSearch():
-    global count, heuristic, cost
+
+tree = json.loads(open("../../Data/Nodes/adjacency_lists/100distance.txt").read())
+
+def AStarSearch(start, end):
+
+    print(f"Starting heuristic calculations...")
+    starttime = datetime.now()
+    heuristic = {}
+    for coord in tqdm.tqdm(original_tree.keys(), desc="Heuristic Calculations"):
+        heuristic[coord] = distance(coord, end)
+    endtime = datetime.now()
+    print(f"Heuristic Calculations took {endtime-starttime}s!\n")
+
+    cost = {start: 0}             # total cost for nodes visited
+
     closed = [] # closed nodes
     opened = [[start, heuristic[start]]]
     # print(type(heuristic[start]))
@@ -375,6 +398,8 @@ def AStarSearch():
         if count % 1000 == 0:
             print(len(fn))
             print(heuristic[min(np.array(opened)[:,0])])
+            if count % 10000 == 2000:
+                print(start, end)
         chosen_index = fn.index(min(fn))
         node = opened[chosen_index][0]  # current node
         closed.append(opened[chosen_index]) # closed.append(opened[chosen_index])
@@ -412,7 +437,32 @@ def AStarSearch():
                 trace_node = check_node
     optimal_sequence.reverse()              # reverse the optimal sequence
 
-    return closed, optimal_sequence
+    return optimal_sequence
+
+paths = []
+for i, cluster in enumerate(percolated_clusters):
+    target_cluster = tuple_to_str(cluster[0])
+
+    if i == 0:
+        paths.append(AStarSearch(start, target_cluster))
+        continue
+    paths.append(AStarSearch(tuple_to_str(percolated_clusters[i - 1][0]), target_cluster))
+    if i == len(percolated_clusters) - 1:
+        paths.append(AStarSearch(target_cluster, end))
+
+final_path = []
+final_path_file = open(f"{start},{end},{p},{e},{no_percolated_clusters}.txt", "a")
+
+for path in paths:
+    for location in path:
+        final_path.append(list(str_to_tuple(location)))
+        final_path_file.write(str(list(str_to_tuple(str(location)))))
+
+final_path_file.close()
+visualize(final_path)
 
 
-
+# Do ellipse cutout at the beginning so we don't do unecessary scenic node calculations.
+# Idea: Take average off all scenic node values (i.e. (0.53 + 0.74 +...)/n) and follow an above saverage route
+# follow an above average route
+plt.show()
