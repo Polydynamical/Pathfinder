@@ -87,7 +87,7 @@ There are a couple of apps in the App Store which have some similarity to the go
     2. Create a shortest/fastest route method with a simple A\* algorithm. (done)
     3. For Explore, use the A\* algorithm to find the shortest route between the "checkpoints" throughout the route. (done)
 		- This could also be done with the GraphHopper API or Google Street View (GSV) API.
-    4. For Navigate, use the weights and ranking of the scenicness and factor that into the weights of the edges between nodes in the algorithm. Essentially, we would be using the scenicness value to subtract from the total $f$-value of the node.
+    4. For Navigate, use the weights and ranking of the scenicness and factor that into the weights of the edges between nodes in the algorithm. Essentially, we would be using the scenicness value to subtract from the total $f$-value of the node. (done)
     	- This will require extensive tuning to ensure that all the constraints of time are met while providing an optimal scenic route.
 	- UPDATE: 10/13/22: The problem with simply using the scenicness as the heuristic is that A* is built around finding the shortest path. I.e. it will start at its current node and just incrementally edge closer to the goal node. 
 	- For a scenic pathfinding algorithm, we need an omniscient view of the map to find the optimal path. One idea for this is using Percolation theory. Check out the Pathfinder/Percolation directory (will merge into parent directory if it works. 
@@ -97,6 +97,7 @@ There are a couple of apps in the App Store which have some similarity to the go
 	- Note that this is simply an idea and I plan on exploring other aspects of graph theory and thinking critically (no pun intended) about incorporating interdisplinary methods into optimizing this project.
 	- Next, implmement an algorithm that will maximize the amount of scenic nodes visited under a certain limit
 	- With knowing exactly which scenic nodes to visit, feed these back into an A* algorithm that will find the shortest path between everything 
+	- 9/12 also implmeneted function to remove dead ends to reduce retracing
 	  
 
 - Book on navigation algorithms "Route Planning Algorithm for Car Navigation" by Flinsenberg, Ingrid C.M. [https://brainmaster.com/software/pubs/brain/Flinsenberg Route Planning.pdf](https://brainmaster.com/software/pubs/brain/Flinsenberg%20Route%20Planning.pdf)

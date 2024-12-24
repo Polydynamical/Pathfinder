@@ -18,16 +18,26 @@ R = 3958.899 # Radius of earth in miles
 def str_to_tuple(tmp: str) -> tuple:
     return tuple([float(x) for x in tuple(tmp.split(","))])
 
+# str_to_tuple = lambda tmp: tuple([float(x) for x in tuple(tmp.split(","))])
+
+
 # (float0, float1) -> ('[float0],[float1]')
 def tuple_to_str(tmp: tuple) -> str:
     return str(tmp).replace("(","").replace(")","").replace(" ","")
 
-start = sys.argv[1]
-end = sys.argv[2]
-# margin = float(sys.argv[3]) # Maybe develop algorithm to set margin based on distance to destination. Maybe 1.5 times the distance? Or maybe based on # of nodes/time. YUP (see "find reasonable clusters" in "percolation search" below. (Use a circle as radius from midpoint of start/end nodes))
-e = float(sys.argv[3]) # eccentricity of ellipse bound
-p = float(sys.argv[4])
-no_percolated_clusters = int(sys.argv[5])
+# tuple_to_str = lambda tmp: str(tmp).replace("(","").replace(")","").replace(" ","")
+
+
+try:
+    start = sys.argv[1]
+    end = sys.argv[2]
+    # margin = float(sys.argv[3]) # Maybe develop algorithm to set margin based on distance to destination. Maybe 1.5 times the distance? Or maybe based on # of nodes/time. YUP (see "find reasonable clusters" in "percolation search" below. (Use a circle as radius from midpoint of start/end nodes))
+    e = float(sys.argv[3]) # eccentricity of ellipse bound
+    p = float(sys.argv[4])
+    no_percolated_clusters = int(sys.argv[5])
+except IndexError:
+    print("FormatError: python3 main.py [START] [END] [ECCENTRICITY OF ELLIPSE PERIMETER] [SCENICNESS CUTOFF] [# OF CLUSTERS]")
+    exit(1)
 
 
 # TODO: use newton's method to find optimal critical value?!!
@@ -50,8 +60,13 @@ print(f"Data loading took {endtime-starttime}s!\n")
 def haversine_from_angle(theta: float) -> float:
     return 0.5 * (1 - cos(theta))
 
+# haversine_from_angle = lambda theta: 0.5 * (1 - cos(theta))
+
+
 def haversine_from_coords(lat1: float, lat2: float, lon1: float, lon2: float) -> float:
     return sqrt( haversine_from_angle( (lat2 - lat1) * pi/180) + cos(lat1 * pi/180) * cos(lat2 * pi/180) * (haversine_from_angle( (lon2 - lon1) * pi/180)) )
+
+# haversine_from_coords = lambda lat1, lat2, lon1, lon2: sqrt( haversine_from_angle( (lat2 - lat1) * pi/180) + cos(lat1 * pi/180) * cos(lat2 * pi/180) * (haversine_from_angle( (lon2 - lon1) * pi/180)) )
 
 def distance(latlon1: str, latlon2: str) -> float:
     lat1, lon1 = latlon1.split(",")
@@ -80,6 +95,17 @@ def midpoint(latlon1: str, latlon2: str) -> str:
 
 
 
+# Figure out which precise point the user wants
+"""
+dist = 0
+for i, coord in original_tree:
+    distance = min(dist, distance(start, coord))
+print(distance)
+
+exit(0)
+"""
+
+
 # Let's make a subtree with the given margin! (reduce search space). 
 # (will work on this later since I don't want to rely on A* search/api.
 # (Simply adding a margin will not work for obscure routes. I.e. where 
@@ -97,6 +123,7 @@ def midpoint(latlon1: str, latlon2: str) -> str:
 
 # TODO: make this function into a class
 def visualize(coords):
+    print("Visualizing...")
     coords = np.asarray(coords)
     x, y = coords[:,1], coords[:,0] # latitude are horizontal lines that give vertical position & longitude are vertical lines that give horizontal position
     x_ticks = [-122.50, -122.45, -122.40, -122.35, -122.30, -122.25, -122.20, -122.15, -122.10]
@@ -200,8 +227,31 @@ print(f"# of Coordinates in Range: {len(tree.items())}")
 
 # Visualize Good Coordinates
 expand_coord_good = []
-for coord in tree.keys():
-    expand_coord_good.append(list(str_to_tuple(coord)))
+
+def demolish_node(node: str):
+    for coord in tree.copy().keys():
+        arr = [x[0] for x in tree[coord]]
+        if node in arr:
+            ind = arr.index(node)
+            del tree[coord][ind]
+
+before = len(tree)
+count = 1 # necessary to determine if we're done
+while count != 0:
+    count = 0
+    for coord in tree.copy().keys():
+        if len(tree[coord]) == 1:
+            demolish_node(coord)
+            del tree[coord]
+
+            count += 1
+after = len(tree)
+
+print(f"Removed {before-after} dead ends")
+
+
+# for coord in tree.copy().keys():
+#     expand_coord_good.append(list(str_to_tuple(coord)))
 
 # visualize(expand_coord_good)
 
@@ -375,19 +425,21 @@ dist_start_to_clusters, percolated_clusters = zip(*sorted(zip(dist_start_to_clus
 
 tree = json.loads(open("../../Data/Nodes/adjacency_lists/100distance.txt").read())
 
-def AStarSearch(start, end):
+def AStarSearch(start, endpoints):
 
     print(f"Starting heuristic calculations...")
     starttime = datetime.now()
     heuristic = {}
     for coord in tqdm.tqdm(original_tree.keys(), desc="Heuristic Calculations"):
-        heuristic[coord] = distance(coord, end)
+        heuristic[coord] = [distance(coord, end)]
     endtime = datetime.now()
     print(f"Heuristic Calculations took {endtime-starttime}s!\n")
 
     cost = {start: 0}             # total cost for nodes visited
 
-    closed = [] # closed nodes
+#    closed = [list((x, heuristic[x])) for x in visited_nodes]
+    closed = []
+    print(closed)
     opened = [[start, heuristic[start]]]
     # print(type(heuristic[start]))
 
@@ -397,7 +449,7 @@ def AStarSearch(start, end):
         fn = [i[1] for i in opened]     # fn = f(n) = g(n) + h(n)
         if count % 1000 == 0:
             print(len(fn))
-            print(heuristic[min(np.array(opened)[:,0])])
+#            print(heuristic[min(np.array(opened)[:,0])])
             if count % 10000 == 2000:
                 print(start, end)
         chosen_index = fn.index(min(fn))
@@ -408,6 +460,9 @@ def AStarSearch(start, end):
 
         if closed[-1][0] == end:        # break the loop if node G has been found
             break
+#        if any(node == end for end in ends):        # break the loop if a node from ends has been found break
+#            break
+
         temparr = [closed_item[0] for closed_item in closed]
         for item in tree[node]:
             if item[0] in temparr:
@@ -420,8 +475,8 @@ def AStarSearch(start, end):
         count += 1
 
     '''find optimal sequence'''
-    trace_node = end                        # correct optimal tracing node, initialize as node G
-    optimal_sequence = [end]                # optimal node sequence
+    trace_node = endpoints[-1]                        # correct optimal tracing node, initialize as node G
+    optimal_sequence = [endpoints[-1]]                # optimal node sequence
     for i in range(len(closed)-2, -1, -1):
         check_node = closed[i][0]           # current node
         if trace_node in [children[0] for children in tree[check_node]]:
@@ -439,16 +494,18 @@ def AStarSearch(start, end):
 
     return optimal_sequence
 
-paths = []
+paths = AStarSearch(start, percolated_clusters)
+"""
 for i, cluster in enumerate(percolated_clusters):
     target_cluster = tuple_to_str(cluster[0])
 
     if i == 0:
-        paths.append(AStarSearch(start, target_cluster))
+        paths += AStarSearch(start, target_cluster, paths)
         continue
-    paths.append(AStarSearch(tuple_to_str(percolated_clusters[i - 1][0]), target_cluster))
+    paths += AStarSearch(tuple_to_str(percolated_clusters[i - 1][0]), target_cluster, paths)
     if i == len(percolated_clusters) - 1:
-        paths.append(AStarSearch(target_cluster, end))
+        paths += AStarSearch(target_cluster, end, paths)
+        """
 
 final_path = []
 final_path_file = open(f"{start},{end},{p},{e},{no_percolated_clusters}.txt", "a")

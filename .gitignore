@@ -1,3 +1,5 @@
-Navigate/Scenery/predict_bdd100k/zip/
 *.h5
 *.pth
+Data/
+Data/
+Data/
